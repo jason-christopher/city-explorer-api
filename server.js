@@ -9,8 +9,14 @@ let data = require('./data/pets.json');
 // `npm i dotenv`
 require('dotenv').config();
 
+// we must include CORS if we want to share resources over the web
+const cors = require('cors');
+const { nextTick } = require('process');
+
 // USE
 const app = express();
+
+app.use(cors());
 
 // define the PORT and validate that our .env is working. If not, uses port 3002
 const PORT = process.env.PORT || 3002;
@@ -31,12 +37,17 @@ app.get('/sayHello', (req, res) => {
   res.send(`Hi ${req.query.name} ${lastName}`);
 });
 
-app.get('/pet', (req, res) => {
-  let species = req.query.species;
+app.get('/pet', (req, res, next) => {
+  try{
+    let species = req.query.species;
 
-  let selectedPet = data.find(pet => pet.species === species);
-  let petCleanedUp = new Pet(selectedPet);
-  res.send(petCleanedUp);
+    let selectedPet = data.find(pet => pet.species === species);
+    let petCleanedUp = new Pet(selectedPet);
+    res.send(petCleanedUp);
+  } catch (error) {
+    // create a new instance of the Error object that lives in Express
+    next(error);
+  }
 });
 
 // '*' is a wild card and must go last
@@ -45,6 +56,11 @@ app.get('*', (req, res) => {
 });
 
 // ERRORS
+
+// handle any errors
+app.use((error, req, res, next) => {
+  res.status(500).send(error.message);
+});
 
 // CLASSES
 class Pet {
