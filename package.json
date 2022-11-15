@@ -1,7 +1,7 @@
 {
   "name": "city-explorer-api",
   "version": "1.0.0",
-  "description": "API for city-exolorer",
+  "description": "API for city-explorer",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
