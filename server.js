@@ -4,14 +4,13 @@ console.log('hi');
 
 // REQUIRE
 const express = require('express');
-let data = require('./data/pets.json');
+let data = require('./data/weather.json');
 
 // `npm i dotenv`
 require('dotenv').config();
 
 // we must include CORS if we want to share resources over the web
 const cors = require('cors');
-const { nextTick } = require('process');
 
 // USE
 const app = express();
@@ -27,23 +26,16 @@ const PORT = process.env.PORT || 3002;
 // create a basic default route
 // app.get() correlates to axios.get()
 // app.get() takes in a parameter or a URL in quotes, and a callback function
-app.get('/', (request, response) => {
-  response.send('Hello');
+app.get('/', (req, res) => {
+  res.send('Base Page');
 });
 
-// works for http://localhost:3001/sayHello?name=Jason&lastName=Christopher
-app.get('/sayHello', (req, res) => {
-  let lastName = req.query.lastName;
-  res.send(`Hi ${req.query.name} ${lastName}`);
-});
-
-app.get('/pet', (req, res, next) => {
+app.get('/weather', (req, res, next) => {
   try{
-    let species = req.query.species;
-
-    let selectedPet = data.find(pet => pet.species === species);
-    let petCleanedUp = new Pet(selectedPet);
-    res.send(petCleanedUp);
+    let city = req.query.city;
+    let cityName = data.find(value => value.city_name === city);
+    let forecast = cityName.data.map( obj => new Forecast(obj));
+    res.send(forecast);
   } catch (error) {
     // create a new instance of the Error object that lives in Express
     next(error);
@@ -63,10 +55,10 @@ app.use((error, req, res, next) => {
 });
 
 // CLASSES
-class Pet {
-  constructor(petObject) {
-    this.name = petObject.name;
-    this.breed = petObject.breed;
+class Forecast{
+  constructor(obj) {
+    this.date = obj.datetime;
+    this.description = obj.weather.description;
   }
 }
 
