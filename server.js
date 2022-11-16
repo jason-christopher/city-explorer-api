@@ -52,7 +52,7 @@ app.get('*', (req, res) => {
 // ERRORS
 
 // handle any errors
-app.use((error, req, res, next) => {
+app.use((error, req, res) => {
   res.status(500).send(error.message);
 });
 
