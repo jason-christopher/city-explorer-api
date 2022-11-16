@@ -12,9 +12,6 @@ require('dotenv').config();
 // we must include CORS if we want to share resources over the web
 const cors = require('cors');
 
-// idk what this is...
-// const { nextTick } = require('process');
-
 // USE
 const app = express();
 
