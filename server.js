@@ -16,11 +16,6 @@ app.use(cors());
 const PORT = process.env.PORT || 3002;
 
 // ROUTES
-// this is where we will write handlers for our endpoints
-
-// create a basic default route
-// app.get() correlates to axios.get()
-// app.get() takes in a parameter or a URL in quotes, and a callback function
 app.get('/', (req, res) => {
   res.status(200).send('Base Page');
 });
@@ -29,11 +24,22 @@ app.get('/weather', async (req, res, next) => {
   try{
     let searchedLat = req.query.queriedLat;
     let searchedLon = req.query.queriedLon;
-    let results = await axios.get(`https://api.weatherbit.io/v2.0/forecast/daily?lat=${searchedLat}&lon=${searchedLon}&key=${process.env.WEATHER_API_KEY}&units=I&days=3`);
-    let forecast = results.data.data.map( obj => new Forecast(obj));
+    let weatherResults = await axios.get(`https://api.weatherbit.io/v2.0/forecast/daily?lat=${searchedLat}&lon=${searchedLon}&key=${process.env.WEATHER_API_KEY}&units=I&days=3`);
+    let forecast = weatherResults.data.data.map( obj => new Forecast(obj));
     res.send(forecast);
   } catch (error) {
-    // create a new instance of the Error object that lives in Express
+    next(error);
+  }
+});
+
+app.get('/movie', async (req, res, next) => {
+  try{
+    let searchedCity = req.query.queriedCity;
+    let movieResults = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${searchedCity}`);
+    let movies = movieResults.data.results.map( obj => new Movie(obj));
+    let topFiveMovies = movies.slice(0,6);
+    res.send(topFiveMovies);
+  } catch (error) {
     next(error);
   }
 });
@@ -55,6 +61,14 @@ class Forecast{
   constructor(obj) {
     this.date = obj.datetime;
     this.description = obj.weather.description;
+  }
+}
+
+class Movie{
+  constructor(obj) {
+    this.releaseDate = obj.release_date.slice(0,4);
+    this.title = obj.title;
+    this.overview = obj.overview;
   }
 }
 
