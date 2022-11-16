@@ -37,8 +37,8 @@ app.get('/movie', async (req, res, next) => {
     let searchedCity = req.query.queriedCity;
     let movieResults = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${searchedCity}`);
     let movies = movieResults.data.results.map( obj => new Movie(obj));
-    let topFiveMovies = movies.slice(0,6);
-    res.send(topFiveMovies);
+    let topSixMovies = movies.slice(0,6);
+    res.send(topSixMovies);
   } catch (error) {
     next(error);
   }
