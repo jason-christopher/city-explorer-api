@@ -1,50 +1,52 @@
-'use strict'
-
-console.log('hi');
+'use strict';
 
 // REQUIRE
-const express = require('express');
-let data = require('./data/weather.json');
-
-// `npm i dotenv`
+// required from npm
 require('dotenv').config();
-
+const express = require('express');
 // we must include CORS if we want to share resources over the web
 const cors = require('cors');
+const axios = require('axios');
 
 // USE
 const app = express();
-
 app.use(cors());
 
 // define the PORT and validate that our .env is working. If not, uses port 3002
 const PORT = process.env.PORT || 3002;
 
 // ROUTES
-// this is where we will write handlers for our endpoints
-
-// create a basic default route
-// app.get() correlates to axios.get()
-// app.get() takes in a parameter or a URL in quotes, and a callback function
 app.get('/', (req, res) => {
-  res.send('Base Page');
+  res.status(200).send('Base Page');
 });
 
-app.get('/weather', (req, res, next) => {
+app.get('/weather', async (req, res, next) => {
   try{
-    let city = req.query.city;
-    let cityName = data.find(value => value.city_name === city);
-    let forecast = cityName.data.map( obj => new Forecast(obj));
+    let searchedLat = req.query.queriedLat;
+    let searchedLon = req.query.queriedLon;
+    let weatherResults = await axios.get(`https://api.weatherbit.io/v2.0/forecast/daily?lat=${searchedLat}&lon=${searchedLon}&key=${process.env.WEATHER_API_KEY}&units=I&days=3`);
+    let forecast = weatherResults.data.data.map( obj => new Forecast(obj));
     res.send(forecast);
   } catch (error) {
-    // create a new instance of the Error object that lives in Express
+    next(error);
+  }
+});
+
+app.get('/movie', async (req, res, next) => {
+  try{
+    let searchedCity = req.query.queriedCity;
+    let movieResults = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${searchedCity}`);
+    let movies = movieResults.data.results.map( obj => new Movie(obj));
+    let topFiveMovies = movies.slice(0,6);
+    res.send(topFiveMovies);
+  } catch (error) {
     next(error);
   }
 });
 
 // '*' is a wild card and must go last
 app.get('*', (req, res) => {
-  res.send('That route does not exist');
+  res.status(404).send('That route does not exist');
 });
 
 // ERRORS
@@ -59,6 +61,14 @@ class Forecast{
   constructor(obj) {
     this.date = obj.datetime;
     this.description = obj.weather.description;
+  }
+}
+
+class Movie{
+  constructor(obj) {
+    this.releaseDate = obj.release_date.slice(0,4);
+    this.title = obj.title;
+    this.overview = obj.overview;
   }
 }
 
