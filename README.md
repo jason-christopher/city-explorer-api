@@ -15,7 +15,9 @@ The user only needs to type a city name in the input field and click the "Explor
 
 The client inputs the name of the desired city. Then the app passes that query as a string to the locationIQ API that returns 10 matches. Only the best match is used and the latitude and longitude is passed again to the LocationIQ API to produce the static image of the city map and the city name is used in the card header. After clicking the "Get Weather" button, the app contacts the server to see if there is a match for the queried city and returns three days of weather information in an array in a JSON file. That weather is then passed to the Forecast.js file where it is extracted and displayed in a modal/carousel.
 
-![WRRC](./public/images/WRRC-Lab7.png)
+### Lab 7
+
+![WRRC](./images/WRRC-Lab7.png)
 
 ## Change Log
 
