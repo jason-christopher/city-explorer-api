@@ -38,7 +38,11 @@ app.get('/movie', async (req, res, next) => {
     let movieResults = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${searchedCity}`);
     let movies = movieResults.data.results.map( obj => new Movie(obj));
     let topSixMovies = movies.slice(0,6);
-    res.send(topSixMovies);
+    let filteredMovies = topSixMovies.map(movie => {
+      movie.releaseDate = movie.releaseDate.slice(0,4);
+      return movie;
+    });
+    res.send(filteredMovies);
   } catch (error) {
     next(error);
   }
@@ -66,9 +70,10 @@ class Forecast{
 
 class Movie{
   constructor(obj) {
-    this.releaseDate = obj.release_date.slice(0,4);
+    this.releaseDate = obj.release_date;
     this.title = obj.title;
     this.overview = obj.overview;
+    this.posterImg = 'https://image.tmdb.org/t/p/w500' + obj.poster_path;
   }
 }
 
