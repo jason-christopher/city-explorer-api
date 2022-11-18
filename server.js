@@ -4,8 +4,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const getWeather = require('./weather');
-const getMovies= require('./movies');
+const getWeather = require('./weather.js');
+const getMovies= require('./movies.js');
 
 // USE
 const app = express();
