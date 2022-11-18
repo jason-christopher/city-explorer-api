@@ -4,13 +4,12 @@ let cache = {};
 
 async function getWeather(req, res, next) {
   try{
-
     let searchedLat = req.query.queriedLat;
     let searchedLon = req.query.queriedLon;
     let key = `${searchedLat}${searchedLon}`;
     let timeRightNow = Date.now();
     // let acceptableTimeToCache = 1000 * 60 * 60 * 6; //6 hours
-    let timeToTestCache = 1000 * 10; // 20 seconds
+    let timeToTestCache = 1000 * 10; // 10 seconds
 
     if(cache[key] && ((timeRightNow - cache[key].timeStamp) < timeToTestCache)) {
       console.log('The data is in cache.');
