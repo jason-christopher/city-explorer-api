@@ -1,14 +1,30 @@
 const axios = require('axios');
 
-// let cache = {};
+let cache = {};
 
 async function getWeather(req, res, next) {
   try{
+
     let searchedLat = req.query.queriedLat;
     let searchedLon = req.query.queriedLon;
-    let weatherResults = await axios.get(`https://api.weatherbit.io/v2.0/forecast/daily?lat=${searchedLat}&lon=${searchedLon}&key=${process.env.WEATHER_API_KEY}&units=I&days=3`);
-    let forecast = weatherResults.data.data.map( obj => new Forecast(obj));
-    res.send(forecast);
+    let key = `${searchedLat}${searchedLon}`;
+    let timeRightNow = Date.now();
+    // let acceptableTimeToCache = 1000 * 60 * 60 * 6; //6 hours
+    let timeToTestCache = 1000 * 10; // 20 seconds
+
+    if(cache[key] && ((timeRightNow - cache[key].timeStamp) < timeToTestCache)) {
+      console.log('The data is in cache.');
+      res.status(200).send(cache[key].data);
+    } else {
+      let weatherResults = await axios.get(`https://api.weatherbit.io/v2.0/forecast/daily?lat=${searchedLat}&lon=${searchedLon}&key=${process.env.WEATHER_API_KEY}&units=I&days=3`);
+      let forecast = weatherResults.data.data.map( obj => new Forecast(obj));
+      console.log('The data is not in cache.');
+      cache[key] = {
+        data: forecast,
+        timeStamp: Date.now(),
+      };
+      res.status(200).send(forecast);
+    }
   } catch (error) {
     Promise.resolve().then(() => {
       throw new Error(error.message);
