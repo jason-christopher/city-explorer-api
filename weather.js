@@ -16,11 +16,11 @@ async function getWeather(req, res, next) {
 
 class Forecast{
   constructor(obj) {
-    this.date = obj.datetime;
-    this.high = obj.high_temp;
-    this.low = obj.low_temp;
+    this.date = obj.datetime.split('').splice(5,5);
+    this.high = obj.high_temp.toString().split('.')[0];
+    this.low = obj.low_temp.toString().split('.')[0];
     this.icon = obj.weather.icon;
-    this.wind = `${obj.wind_cdir} ${obj.wind_spd} mph`;
+    this.wind = `${obj.wind_cdir} ${obj.wind_spd.toString().split('.')[0]} mph`;
     this.description = obj.weather.description;
   }
 }
